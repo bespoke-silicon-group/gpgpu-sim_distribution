@@ -1,7 +1,8 @@
 *~
 *.swp
 *.swo
-
+*_app_cuda*
+*_cuobjdump*
 src/intersim2/lex.yy.c
 src/intersim2/y.tab.c
 src/intersim2/y.tab.h
