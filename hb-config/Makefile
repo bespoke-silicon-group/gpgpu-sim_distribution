@@ -8,6 +8,7 @@ SHELL := /bin/bash
 
 .PHONY: sparse_data SpGEMM BFS
 
+SpGEMM_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
 SpGEMM: sparse_data ${BIN}/spgemm
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -15,10 +16,9 @@ SpGEMM: sparse_data ${BIN}/spgemm
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
-	i=../datasets/sparse/wiki-Vote.mtx; \
-	filename=$$(basename -a -s .mtx $$i); \
-	${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out; \
-	
+	for i in ${SpGEMM_INPUTS}; do \
+		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/$$i.out & \
+	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
 #		filename=$$(basename -a -s .mtx $$i); \
