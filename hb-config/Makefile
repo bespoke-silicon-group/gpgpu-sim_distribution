@@ -15,7 +15,6 @@ SpGEMM: sparse_data ${BIN}/spgemm
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
-	touch ${RESULTS}/SpGEMM.out; \
 	i=../datasets/sparse/wiki-Vote.mtx; \
 	filename=$$(basename -a -s .mtx $$i); \
 	${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out; \
@@ -75,7 +74,7 @@ AES:
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE}
 	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in
 
-BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt #in_64K.txt in_10M.txt
+BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
 BS:
 	cd ${DATASET}; $(MAKE) BLK
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
