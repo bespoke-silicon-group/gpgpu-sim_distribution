@@ -34,13 +34,13 @@ BFS: sparse_data
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/bfs; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/wiki-Vote.mtx 4668; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/soc-Pokec.mtx  816408 >> ${RESULTS}/bfs.out; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/hollywood-2009.mtx 570170 >> ${RESULTS}/bfs.out; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/ljournal-2008.mtx 2681669 >> ${RESULTS}/bfs.out; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/roadNet-CA.mtx 985640 >> ${RESULTS}/bfs.out; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_central.mtx 7040908 >> ${RESULTS}/bfs.out; \
-	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_usa.mtx 11973673 >> ${RESULTS}/bfs.out;
+	${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/wiki-Vote.mtx 4668; #\
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/soc-Pokec.mtx  816408 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/hollywood-2009.mtx 570170 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/ljournal-2008.mtx 2681669 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/roadNet-CA.mtx 985640 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_central.mtx 7040908 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_usa.mtx 11973673 >> ${RESULTS}/bfs.out;
 
 SSSP: sparse_data
 	${BIN}/sssp --graph-type market --src 4668 --graph-file ${SPARSE}/wiki-Vote.gr
@@ -75,12 +75,19 @@ AES:
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE}
 	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in
 
-BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
-BlackScholes:
+BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt #in_64K.txt in_10M.txt
+BS:
 	cd ${DATASET}; $(MAKE) BLK
-	for i in $$(ls ${DATASET}/BLK/in_*); do \
-		echo $$i; \
-		${BIN}/BlackScholes $$i; \
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/BS; \
+	touch ${RESULTS}/BS.out; \
+	for i in ${BLK_INPUTS}; do \
+		echo BLK/$$i; \
+		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$$i; \
 	done
 
 ${CUDA_PATH}/include/cusp: cusp/
