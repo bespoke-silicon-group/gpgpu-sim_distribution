@@ -1,6 +1,6 @@
-all: wiki-Vote.mtx soc-Pokec.mtx hollywood-2009.mtx ljournal-2008.mtx roadNet-CA.mtx road_central.mtx road_usa.mtx offshore.mtx #wiki-Vote.gr soc-Pokec.gr hollywood-2009.gr ljournal-2008.gr roadNet-CA.gr road_central.gr road_usa.gr offshore.gr
+all: wiki-Vote.mtx #soc-Pokec.mtx hollywood-2009.mtx ljournal-2008.mtx roadNet-CA.mtx road_central.mtx road_usa.mtx offshore.mtx #wiki-Vote.gr soc-Pokec.gr hollywood-2009.gr ljournal-2008.gr roadNet-CA.gr road_central.gr road_usa.gr offshore.gr
 	
-%.mtx: | %.tar.gz
+%.mtx: %.tar.gz
 	tar -xf $<
 	cp $*/$*.mtx ./
 
