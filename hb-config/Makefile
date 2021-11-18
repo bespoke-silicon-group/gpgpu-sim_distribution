@@ -5,11 +5,12 @@ BIN=../precompiled_bin
 SCRIPTS=./scripts
 RESULTS=./results
 SHELL := /bin/bash
+TS := $(shell /bin/date "+%Y-%m-%d_%H-%M-%S")
 
-.PHONY: sparse_data SpGEMM BFS
+.PHONY: sparse_data SpGEMM BFS clean_folder
 
 SpGEMM_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
-SpGEMM: sparse_data ${BIN}/spgemm
+SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -17,7 +18,7 @@ SpGEMM: sparse_data ${BIN}/spgemm
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
 	for i in ${SpGEMM_INPUTS}; do \
-		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/$$i.out & \
+		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/${TS}_$$i.out & \
 	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
@@ -26,7 +27,7 @@ SpGEMM: sparse_data ${BIN}/spgemm
 #	done
 	wait
 
-BFS: sparse_data
+BFS: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -41,7 +42,7 @@ BFS: sparse_data
 	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_central.mtx 7040908 >> ${RESULTS}/bfs.out; \
 	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_usa.mtx 11973673 >> ${RESULTS}/bfs.out;
 
-SSSP: sparse_data
+SSSP: sparse_data clean_folder
 	${BIN}/sssp --graph-type market --src 4668 --graph-file ${SPARSE}/wiki-Vote.gr
 	${BIN}/sssp --graph-type market --src 816408 --graph-file ${SPARSE}/soc-Pokec.gr
 	${BIN}/sssp --graph-type market --src 570170 --graph-file ${SPARSE}/hollywood-2009.gr
@@ -50,7 +51,7 @@ SSSP: sparse_data
 	${BIN}/sssp --graph-type market --src 7040908 --graph-file ${SPARSE}/road_central.gr
 	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
 
-PR: sparse_data
+PR: sparse_data clean_folder 
 	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/wiki-Vote.mtx
 	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/soc-Pokec.mtx
 	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/hollywood-2009.mtx
@@ -59,7 +60,7 @@ PR: sparse_data
 	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_central.mtx
 	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_usa.mtx
 	
-FFT:
+FFT: clean_folder
 	${BIN}/fft 32768 1
 	${BIN}/fft 65536 1
 	${BIN}/fft 524288 1
@@ -68,14 +69,31 @@ FFT:
 	${BIN}/fft 65536 0
 	${BIN}/fft 524288 0
 	${BIN}/fft 1048576 0
+
 # 1 MB
-AES_SIZE ?= 1048576
-AES:
-	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE}
-	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in
+AES_SIZE ?= 524288#1048576
+AES: clean_folder
+	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE};
+	
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/AES; \
+	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/${TS}_${AES_SIZE}.out
+
+JACOBI_ITER ?= 1
+Jacobi:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/${TS}_jacobi_512x512x64_${JACOBI_ITER}_iter.out
 
 BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
-BS:
+BS: clean_folder
 	cd ${DATASET}; $(MAKE) BLK
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -86,7 +104,7 @@ BS:
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$$i; \
+		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/${TS}_$$i; \
 	done
 
 ${CUDA_PATH}/include/cusp: cusp/
@@ -95,6 +113,9 @@ ${CUDA_PATH}/include/cusp: cusp/
 sparse_data: 
 	cd ${DATASET}; make sparse_data
 
+clean_folder:
+	rm -f _app_cuda*
+	rm -f _cuobjdump*
 
 /usr/local/cuda:
 	wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
