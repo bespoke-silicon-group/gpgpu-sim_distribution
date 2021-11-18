@@ -81,7 +81,7 @@ FFT: clean_folder
 	${BIN}/fft 1048576 0
 
 # 1 MB
-AES_SIZE ?= 524288#1048576
+AES_SIZE ?= 1048576
 AES: clean_folder
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE};
 	
