@@ -18,7 +18,7 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
 	for i in ${SpGEMM_INPUTS}; do \
-		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/${TS}_$$i.out & \
+		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/$$i_${TS}.out & \
 	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
@@ -26,6 +26,16 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 #		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out & \
 #	done
 	wait
+
+SGEMM_SIZE ?= 512
+SGEMM:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SGEMM; \
+	${BIN}/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
 
 BFS: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -81,16 +91,16 @@ AES: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/AES; \
-	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/${TS}_${AES_SIZE}.out
+	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/aes_${AES_SIZE}_${TS}.out
 
 JACOBI_ITER ?= 1
-Jacobi:
+Jacobi: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
 	$(MAKE) --silent; \
 	cd hb-config; \
-	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/${TS}_jacobi_512x512x64_${JACOBI_ITER}_iter.out
+	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
 
 BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
 BS: clean_folder
@@ -104,8 +114,17 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/${TS}_$$i; \
+		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$$i_${TS}; \
 	done
+	
+SW: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SW; \
+	${BIN}/sw dna ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta output > ${RESULTS}/SW/sw_${TS}.out
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
