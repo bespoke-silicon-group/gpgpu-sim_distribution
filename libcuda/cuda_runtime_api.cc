@@ -827,6 +827,8 @@ cudaError_t cudaConfigureCallInternal(dim3 gridDim, dim3 blockDim,
   if (g_debug_execution >= 3) {
     announce_call(__my_func__);
   }
+  if(stream == (cudaStream_t)1)
+    stream = (cudaStream_t)0;
   struct CUstream_st *s = (struct CUstream_st *)stream;
   ctx->api->g_cuda_launch_stack.push_back(
       kernel_config(gridDim, blockDim, sharedMem, s));
