@@ -81,7 +81,7 @@ FFT: clean_folder
 	${BIN}/fft 1048576 0
 
 # 1 MB
-AES_SIZE ?= 1048576
+AES_SIZE ?= 16777216
 AES: clean_folder
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE};
 	
@@ -124,7 +124,7 @@ SW: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SW; \
-	${BIN}/sw dna ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta output > ${RESULTS}/SW/sw_${TS}.out
+	${BIN}/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/

@@ -136,6 +136,8 @@ set	TC; yylval->int_value = SET_OP; return OPCODE;
 shfl	TC; yylval->int_value = SHFL_OP; return OPCODE;
 shl     TC; yylval->int_value = SHL_OP; return OPCODE;
 shr     TC; yylval->int_value = SHR_OP; return OPCODE;
+shf.l.wrap     TC; yylval->int_value = SHF_L_WRAP_OP; return OPCODE;
+shf.r.wrap     TC; yylval->int_value = SHF_R_WRAP_OP; return OPCODE;
 sin	TC; yylval->int_value = SIN_OP; return OPCODE;
 slct	TC; yylval->int_value = SLCT_OP; return OPCODE;
 sqrt	TC; yylval->int_value = SQRT_OP; return OPCODE;
@@ -171,6 +173,11 @@ breakaddr  TC; yylval->int_value = BREAKADDR_OP; return OPCODE;
 "CPTX_END"	printf("ENDING CUSTOM PTX.\n"); BEGIN(IN_COMMENT);
 
 <INITIAL,NOT_OPCODE,IN_INST,IN_FUNC_DECL>{
+\.a\.sync TC; yylval->int_value = LOAD_A; return WMMA_DIRECTIVE;
+\.b\.sync TC; yylval->int_value = LOAD_B; return WMMA_DIRECTIVE;
+\.c\.sync TC; yylval->int_value = LOAD_C; return WMMA_DIRECTIVE;
+\.d\.sync TC; yylval->int_value = STORE_D; return WMMA_DIRECTIVE;
+\.mma\.sync TC;yylval->int_value=MMA; return WMMA_DIRECTIVE;
 \.a\.sync\.aligned TC; yylval->int_value = LOAD_A; return WMMA_DIRECTIVE;
 \.b\.sync\.aligned TC; yylval->int_value = LOAD_B; return WMMA_DIRECTIVE;
 \.c\.sync\.aligned TC; yylval->int_value = LOAD_C; return WMMA_DIRECTIVE;
