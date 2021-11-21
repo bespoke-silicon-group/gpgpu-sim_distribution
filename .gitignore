@@ -63,3 +63,6 @@ accel-sim-framework/
 gpu-app-collection/
 *.ptx
 *.ptxas
+*.tar.gz
+*.out
+*.tar
