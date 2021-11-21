@@ -1,4 +1,4 @@
-CUDA_PATH=/usr/local/cuda/
+CUDA_PATH=/usr/local/cuda-11/
 DATASET=../datasets
 SPARSE=${DATASET}/sparse
 BIN=../precompiled_bin
@@ -27,7 +27,7 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 #	done
 	wait
 
-SGEMM_SIZE ?= 512
+SGEMM_SIZE ?= 2048
 SGEMM:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
