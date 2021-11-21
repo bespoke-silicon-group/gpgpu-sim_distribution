@@ -5549,6 +5549,60 @@ void shr_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
   thread->set_operand_value(dst, d, i_type, thread, pI);
 }
 
+void shf_l_wrap_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
+  ptx_reg_t a, b, c, d;
+  const operand_info &dst = pI->dst();
+  const operand_info &src1 = pI->src1();
+  const operand_info &src2 = pI->src2();
+  const operand_info &src3 = pI->src3();
+
+  unsigned i_type = pI->get_type();
+  a = thread->get_operand_value(src1, dst, i_type, thread, 1);
+  b = thread->get_operand_value(src2, dst, i_type, thread, 1);
+  c = thread->get_operand_value(src3, dst, i_type, thread, 1);
+
+  uint32_t n = c.u32 & 0x1f;
+
+  switch (i_type) {
+    case B32_TYPE:
+      d.u32 = (b.u32 << n) | (a.u32 >> (32-n)); // Taken from PTX documentation
+      break;
+    default:
+      printf("Execution error: type mismatch with instruction\n");
+      assert(0);
+      break;
+  }
+
+  thread->set_operand_value(dst, d, i_type, thread, pI);
+}
+
+void shf_r_wrap_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
+  ptx_reg_t a, b, c, d;
+  const operand_info &dst = pI->dst();
+  const operand_info &src1 = pI->src1();
+  const operand_info &src2 = pI->src2();
+  const operand_info &src3 = pI->src3();
+
+  unsigned i_type = pI->get_type();
+  a = thread->get_operand_value(src1, dst, i_type, thread, 1);
+  b = thread->get_operand_value(src2, dst, i_type, thread, 1);
+  c = thread->get_operand_value(src3, dst, i_type, thread, 1);
+
+  uint32_t n = c.u32 & 0x1f;
+
+  switch (i_type) {
+    case B32_TYPE:
+        d.u32 = (b.u32 << (32 - n)) | (a.u32 >> n); // Taken from PTX documentation
+      break;
+    default:
+      printf("Execution error: type mismatch with instruction\n");
+      assert(0);
+      break;
+  }
+
+  thread->set_operand_value(dst, d, i_type, thread, pI);
+}
+
 void sin_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
   ptx_reg_t a, d;
   const operand_info &dst = pI->dst();
