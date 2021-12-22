@@ -117,6 +117,15 @@ BS: clean_folder
 		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$$i_${TS}; \
 	done
 	
+NFA: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/NFA; \
+	${BIN}/nfa_engine -a ${DATASET}/Sample_NFA/Sample_NFA -i ${DATASET}/random_stream_1KB.input -T 1024 -g 1 -p 1 -N 3072 -O 1 > ${RESULTS}/NFA/nfa_${TS}.out
+	
 SW: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
