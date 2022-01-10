@@ -61,14 +61,32 @@ SSSP: sparse_data clean_folder
 	${BIN}/sssp --graph-type market --src 7040908 --graph-file ${SPARSE}/road_central.gr
 	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
 
+
+
+PR_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
 PR: sparse_data clean_folder 
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/wiki-Vote.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/soc-Pokec.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/hollywood-2009.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/ljournal-2008.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/roadNet-CA.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_central.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_usa.mtx
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/PR; \
+	for i in ${PR_INPUTS}; do \
+		${BIN}/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out & \
+	done
+	
+#	for i in $$(ls ${SPARSE}/*.mtx); do \
+#		filename=$$(basename -a -s .mtx $$i); \
+#		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out & \
+#	done
+	wait
+	#${BIN}/pr ${SPARSE}/wiki-Vote.mtx
+	#${BIN}/pr ${SPARSE}/soc-Pokec.mtx
+	#${BIN}/pr ${SPARSE}/hollywood-2009.mtx
+	#${BIN}/pr ${SPARSE}/ljournal-2008.mtx
+	#${BIN}/pr ${SPARSE}/roadNet-CA.mtx
+	#${BIN}/pr ${SPARSE}/road_central.mtx
+	#${BIN}/pr ${SPARSE}/road_usa.mtx
 	
 FFT: clean_folder
 	${BIN}/fft 32768 1

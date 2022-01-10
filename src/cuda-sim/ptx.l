@@ -72,6 +72,7 @@ bar 	TC; yylval->int_value = BAR_OP; return OPCODE;
 bfe     TC; yylval->int_value = BFE_OP; return OPCODE;
 bfi     TC; yylval->int_value = BFI_OP; return OPCODE;
 bfind   TC; yylval->int_value = BFIND_OP; return OPCODE;
+bfind.shiftamt TC; yylval->int_value = BFIND_SHIFT_OP; return OPCODE;
 bra     TC; yylval->int_value = BRA_OP; return OPCODE;
 brx     TC; yylval->int_value = BRX_OP; return OPCODE;
 brev    TC; yylval->int_value = BREV_OP; return OPCODE;

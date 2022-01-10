@@ -329,6 +329,7 @@ void function_info::ptx_assemble() {
             "GPGPU-Sim PTX: Loader error (%s:%u): Branch label \"%s\" does not "
             "appear in assembly code.",
             pI->source_file(), pI->source_line(), target.name().c_str());
+        fflush(stdout);
         abort();
       }
       unsigned index = labels[target.name()];  // determine address from name
