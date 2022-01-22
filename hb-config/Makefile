@@ -18,7 +18,7 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
 	for i in ${SpGEMM_INPUTS}; do \
-		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$$i.mtx > ${RESULTS}/SpGEMM/$$i_${TS}.out & \
+		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM/$${i}_${TS}.out & \
 	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
@@ -62,14 +62,78 @@ SSSP: sparse_data clean_folder
 	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
 
 PR: sparse_data clean_folder 
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/wiki-Vote.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/soc-Pokec.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/hollywood-2009.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/ljournal-2008.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/roadNet-CA.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_central.mtx
-	${BIN}/pr --graph-type market --pull=true --graph-file ${SPARSE}/road_usa.mtx
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/PR; \
+	for i in ${PR_INPUTS}; do \
+		${SCRIPTS}/run_graphit.sh ${BIN}/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out & \
+	done; \
+	wait
 	
+#	for i in $$(ls ${SPARSE}/*.mtx); do \
+#		filename=$$(basename -a -s .mtx $$i); \
+#		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out & \
+#	done
+	#${BIN}/pr ${SPARSE}/wiki-Vote.mtx
+	#${BIN}/pr ${SPARSE}/soc-Pokec.mtx
+	#${BIN}/pr ${SPARSE}/hollywood-2009.mtx
+	#${BIN}/pr ${SPARSE}/ljournal-2008.mtx
+	#${BIN}/pr ${SPARSE}/roadNet-CA.mtx
+	#${BIN}/pr ${SPARSE}/road_central.mtx
+	#${BIN}/pr ${SPARSE}/road_usa.mtx
+
+
+
+BFS_graphit: sparse_data clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/bfs; \
+	${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out & \
+	${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
+	${BIN}/bfs_social ${SPARSE}/hollywood-2009.mtx 570170 0.026 > ${RESULTS}/bfs/hollywood-2009_${TS}.out  & \
+	${BIN}/bfs_social ${SPARSE}/ljournal-2008.mtx 2681669 0.006 > ${RESULTS}/bfs/ljournal-2008_${TS}.out  & \
+	${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
+	${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
+	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  & \
+	wait
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/soc-Pokec.mtx  816408 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/hollywood-2009.mtx 570170 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/ljournal-2008.mtx 2681669 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/roadNet-CA.mtx 985640 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_central.mtx 7040908 >> ${RESULTS}/bfs.out; \
+	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/road_usa.mtx 11973673 >> ${RESULTS}/bfs.out;
+
+SSSP_graphit: sparse_data clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/sssp; \
+	${BIN}/ds_social ${SPARSE}/wiki-Vote.mtx 4668 15 > ${RESULTS}/sssp/wiki-Vote_${TS}.out & \
+	${BIN}/ds_social ${SPARSE}/soc-Pokec.mtx 816408 120 > ${RESULTS}/sssp/soc-Pokec_${TS}.out  & \
+	${BIN}/ds_social ${SPARSE}/hollywood-2009.mtx 570170 15 > ${RESULTS}/sssp/hollywood-2009_${TS}.out  & \
+	${BIN}/ds_social ${SPARSE}/ljournal-2008.mtx 2681669 120 > ${RESULTS}/sssp/ljournal-2008_${TS}.out  & \
+	${BIN}/ds_road ${SPARSE}/roadNet-CA.mtx 985640 20000 > ${RESULTS}/sssp/roadNet-CA_${TS}.out  & \
+	${BIN}/ds_road ${SPARSE}/road_central.mtx 7040908 30000 > ${RESULTS}/sssp/road_central_${TS}.out  & \
+	${BIN}/ds_road ${SPARSE}/road_usa.mtx 11973673 80000 > ${RESULTS}/sssp/road_usa_${TS}.out  & \
+	wait
+
+SSSP: sparse_data clean_folder
+	${BIN}/sssp --graph-type market --src 4668 --graph-file ${SPARSE}/wiki-Vote.gr
+	${BIN}/sssp --graph-type market --src 816408 --graph-file ${SPARSE}/soc-Pokec.gr
+	${BIN}/sssp --graph-type market --src 570170 --graph-file ${SPARSE}/hollywood-2009.gr
+	${BIN}/sssp --graph-type market --src 2681669 --graph-file ${SPARSE}/ljournal-2008.gr
+	${BIN}/sssp --graph-type market --src 985640 --graph-file ${SPARSE}/roadNet-CA.gr
+	${BIN}/sssp --graph-type market --src 7040908 --graph-file ${SPARSE}/road_central.gr
+	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
+
 FFT: clean_folder
 	${BIN}/fft 32768 1
 	${BIN}/fft 65536 1
