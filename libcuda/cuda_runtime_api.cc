@@ -5193,7 +5193,7 @@ CUresult CUDAAPI cuPointerGetAttribute(void *data,
 #endif /* CUDART_VERSION >= 4000 */
 
 #if CUDART_VERSION >= 8000
-__host__ cudaError_t CUDARTAPI cudaCreateTextureObject(
+extern "C" __host__ cudaError_t CUDARTAPI cudaCreateTextureObject(
     cudaTextureObject_t *pTexObject, const cudaResourceDesc *pResDesc,
     const cudaTextureDesc *pTexDesc, const cudaResourceViewDesc *pResViewDesc) {
   if (g_debug_execution >= 3) {
