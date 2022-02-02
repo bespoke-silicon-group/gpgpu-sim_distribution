@@ -206,7 +206,7 @@ void ptx_recognizer::end_function() {
   gpgpu_ptx_assemble(g_func_info->get_name(), g_func_info);
   g_current_symbol_table = g_global_symbol_table;
 
-  PTX_PARSE_DPRINTF("function %s, PC = %d\n", g_func_info->get_name().c_str(),
+  PTX_PARSE_DPRINTF("function %s, PC = %llu\n", g_func_info->get_name().c_str(),
                     g_func_info->get_start_PC());
 }
 
@@ -486,7 +486,7 @@ void ptx_recognizer::add_identifier(const char *identifier, int array_dim,
     case param_space_local:
       printf(
           "GPGPU-Sim PTX: allocating stack frame region for .param \"%s\" from "
-          "0x%x to 0x%lx\n",
+          "0x%llx to 0x%llx\n",
           identifier, g_current_symbol_table->get_local_next(),
           g_current_symbol_table->get_local_next() + num_bits / 8);
       fflush(stdout);

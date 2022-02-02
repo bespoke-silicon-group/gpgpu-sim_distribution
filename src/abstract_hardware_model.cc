@@ -625,11 +625,16 @@ void warp_inst_t::memory_coalescing_arch_atomic(bool is_write,
       if (!active(thread)) continue;
 
       new_addr_type addr = m_per_scalar_thread[thread].memreqaddr[0];
-      unsigned block_address = line_size_based_tag_func(addr, segment_size);
-      unsigned chunk =
+      unsigned long long block_address = line_size_based_tag_func(addr, segment_size);
+      unsigned long long chunk =
           (addr & 127) / 32;  // which 32-byte chunk within in a 128-byte chunk
                               // does this thread access?
 
+      if(block_address !=
+             line_size_based_tag_func(addr + data_size - 1, segment_size)) {
+      printf("Block addr: %u, line_size_based_tag_func: %llu, addr: %llu, data_size: %u, segment_size: %u\n", block_address, line_size_based_tag_func(addr + data_size - 1, segment_size), addr, data_size, segment_size);
+      fflush(stdout);
+      }
       // can only write to one segment
       assert(block_address ==
              line_size_based_tag_func(addr + data_size - 1, segment_size));
