@@ -317,7 +317,7 @@ class ptx_thread_info {
                               int derefFlag);
   void set_operand_value(const operand_info &dst, const ptx_reg_t &data,
                          unsigned type, ptx_thread_info *thread,
-                         const ptx_instruction *pI);
+                         const ptx_instruction *pI, bool shfl = false);
   void set_operand_value(const operand_info &dst, const ptx_reg_t &data,
                          unsigned type, ptx_thread_info *thread,
                          const ptx_instruction *pI, int overflow, int carry);
