@@ -584,7 +584,8 @@ void ptx_thread_info::set_operand_value(const operand_info &dst,
 void ptx_thread_info::set_operand_value(const operand_info &dst,
                                         const ptx_reg_t &data, unsigned type,
                                         ptx_thread_info *thread,
-                                        const ptx_instruction *pI) {
+                                        const ptx_instruction *pI,
+                                        bool shfl) {
   ptx_reg_t dstData;
   memory_space *mem = NULL;
   size_t size;
@@ -623,6 +624,10 @@ void ptx_thread_info::set_operand_value(const operand_info &dst,
       ptx_reg_t predValue;
       const symbol *predName = dst.vec_symbol(0);
       const symbol *regName = dst.vec_symbol(1);
+      if(shfl) {
+        predName = dst.vec_symbol(1);
+        regName = dst.vec_symbol(0);
+      }
       predValue.u64 = 0;
 
       switch (type) {
@@ -5448,7 +5453,7 @@ void shfl_impl(const ptx_instruction *pI, core_t *core, warp_inst_t inst) {
         "threads in a warp\n");
     data.u32 = 0;
   }
-  thread->set_operand_value(dst, data, i_type, thread, pI);
+  thread->set_operand_value(dst, data, i_type, thread, pI, true);
 
   /*
   TODO: deal with predicates appropriately using the following pseudocode:
