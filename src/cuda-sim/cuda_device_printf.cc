@@ -65,7 +65,7 @@ void my_cuda_printf(const char *fmtstr, const char *arg_list) {
         double tmp = *((double *)ptr);
         fprintf(fp, buf, tmp);
       }
-      arg_offset++;
+      arg_offset += 4;
       in_fmt = false;
     }
   }
