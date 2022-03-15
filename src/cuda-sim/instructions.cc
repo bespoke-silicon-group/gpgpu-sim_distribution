@@ -3996,6 +3996,12 @@ void mad_def(const ptx_instruction *pI, ptx_thread_info *thread,
         case RZ_OPTION:
           fesetround(FE_TOWARDZERO);
           break;
+        case RM_OPTION:
+          fesetround(FE_DOWNWARD);
+          break;
+        case RP_OPTION:
+          fesetround(FE_UPWARD);
+          break;
         default:
           assert(0);
           break;
