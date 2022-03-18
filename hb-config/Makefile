@@ -88,14 +88,14 @@ BFS_graphit: sparse_data clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/bfs; \
-	${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
+	${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
+	${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
+	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  &
+	wait
+	#${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
 	#${BIN}/bfs_social ${SPARSE}/hollywood-2009.mtx 570170 0.026 > ${RESULTS}/bfs/hollywood-2009_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/ljournal-2008.mtx 2681669 0.006 > ${RESULTS}/bfs/ljournal-2008_${TS}.out  & \
-	#${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
-	#${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
-	#${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  &
-	wait
 	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/soc-Pokec.mtx  816408 >> ${RESULTS}/bfs.out; \
 	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/hollywood-2009.mtx 570170 >> ${RESULTS}/bfs.out; \
 	#${SCRIPTS}/run_bfs.sh ${BIN} ${SPARSE}/ljournal-2008.mtx 2681669 >> ${RESULTS}/bfs.out; \
@@ -171,7 +171,7 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$$i_${TS}; \
+		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
 	done
 	
 NFA: clean_folder
