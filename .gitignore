@@ -3,6 +3,11 @@
 *.swo
 *_app_cuda*
 *_cuobjdump*
+**/*.mtx*
+**/*.txt
+**/*.in
+**/.vscode
+precompiled_bin/**
 src/intersim2/lex.yy.c
 src/intersim2/y.tab.c
 src/intersim2/y.tab.h
