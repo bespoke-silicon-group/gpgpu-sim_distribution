@@ -879,4 +879,5 @@ unsigned dram_t::get_bankgrp_number(unsigned i) {
   } else {
     assert(1);
   }
+  return 0;
 }
