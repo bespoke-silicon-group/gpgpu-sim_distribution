@@ -1969,7 +1969,7 @@ __host__ cudaError_t CUDARTAPI cudaLaunchKernelInternal(
   }
   CUctx_st *context = GPGPUSim_Context(ctx);
   function_info *entry = context->get_kernel(hostFun);
-#if CUDART_VERSION < 10000
+#if CUDART_VERSION < 12000
   cudaConfigureCallInternal(gridDim, blockDim, sharedMem, stream, ctx);
 #endif
   for (unsigned i = 0; i < entry->num_args(); i++) {
@@ -2767,6 +2767,16 @@ __host__ cudaError_t CUDARTAPI cudaLaunchKernel(const char *hostFun,
   return cudaLaunchKernelInternal(hostFun, gridDim, blockDim, args, sharedMem,
                                   stream);
 }
+
+__host__ cudaError_t CUDARTAPI cudaLaunchCooperativeKernel(const char *hostFun,
+                                                dim3 gridDim, dim3 blockDim,
+                                                const void **args,
+                                                size_t sharedMem,
+                                                cudaStream_t stream) {
+  return cudaLaunchKernelInternal(hostFun, gridDim, blockDim, args, sharedMem,
+                                  stream);
+}
+
 
 /*******************************************************************************
  *                                                                              *
@@ -5483,6 +5493,16 @@ CUresult CUDAAPI cuLaunchKernel(CUfunction f, unsigned int gridDimX,
   return cuLaunchKernelInternal(f, gridDimX, gridDimY, gridDimZ, blockDimX,
                                 blockDimY, blockDimZ, sharedMemBytes, hStream,
                                 kernelParams, extra);
+}
+
+CUresult CUDAAPI cuLaunchCooperativeKernel(
+    CUfunction f, unsigned int gridDimX, unsigned int gridDimY,
+    unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY,
+    unsigned int blockDimZ, unsigned int sharedMemBytes, CUstream hStream,
+    void **kernelParams) {
+  return cuLaunchKernelInternal(f, gridDimX, gridDimY, gridDimZ, blockDimX,
+                                blockDimY, blockDimZ, sharedMemBytes, hStream,
+                                kernelParams, NULL);
 }
 #endif /* CUDART_VERSION >= 4000 */
 
