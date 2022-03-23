@@ -285,8 +285,8 @@ ptx_reg_t ptx_thread_info::get_operand_value(const operand_info &op,
         } else if (info.is_param_local()) {
           result.u64 = sym->get_address() + op.get_addr_offset();
         } else if (info.is_global()) {
-          assert(op.get_addr_offset() == 0);
-          result.u64 = sym->get_address();
+          //assert(op.get_addr_offset() == 0);
+          result.u64 = sym->get_address() + op.get_addr_offset();
         } else if (info.is_local()) {
           result.u64 = sym->get_address() + op.get_addr_offset();
         } else if (info.is_const()) {
@@ -301,6 +301,7 @@ ptx_reg_t ptx_thread_info::get_operand_value(const operand_info &op,
               "GPGPU-Sim PTX: ERROR ** get_operand_value : unknown memory "
               "operand type for %s\n",
               name);
+          fflush(stdout);
           abort();
         }
 
