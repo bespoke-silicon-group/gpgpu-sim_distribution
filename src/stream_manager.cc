@@ -32,7 +32,7 @@
 #include "gpgpu-sim/gpu-sim.h"
 #include "gpgpusim_entrypoint.h"
 
-unsigned CUstream_st::sm_next_stream_uid = 0;
+unsigned CUstream_st::sm_next_stream_uid = 1;
 
 CUstream_st::CUstream_st() {
   m_pending = false;
