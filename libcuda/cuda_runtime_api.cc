@@ -1969,7 +1969,7 @@ __host__ cudaError_t CUDARTAPI cudaLaunchKernelInternal(
   }
   CUctx_st *context = GPGPUSim_Context(ctx);
   function_info *entry = context->get_kernel(hostFun);
-#if CUDART_VERSION < 12000
+#if CUDART_VERSION < 10000
   cudaConfigureCallInternal(gridDim, blockDim, sharedMem, stream, ctx);
 #endif
   for (unsigned i = 0; i < entry->num_args(); i++) {
@@ -2773,8 +2773,26 @@ __host__ cudaError_t CUDARTAPI cudaLaunchCooperativeKernel(const char *hostFun,
                                                 const void **args,
                                                 size_t sharedMem,
                                                 cudaStream_t stream) {
-  return cudaLaunchKernelInternal(hostFun, gridDim, blockDim, args, sharedMem,
-                                  stream);
+  gpgpu_context *ctx = GPGPU_Context();
+
+  if (g_debug_execution >= 3) {
+    announce_call(__my_func__);
+  }  
+
+  CUctx_st *context = GPGPUSim_Context(ctx);
+
+  ctx->set_envreg(2, 1);
+  ctx->set_envreg(1, 1);
+
+  function_info *entry = context->get_kernel(hostFun);
+  cudaConfigureCallInternal(gridDim, blockDim, sharedMem, stream, ctx);
+  for (unsigned i = 0; i < entry->num_args(); i++) {
+    std::pair<size_t, unsigned> p = entry->get_param_config(i);
+    cudaSetupArgumentInternal(args[i], p.first, p.second);
+  }
+
+  cudaLaunchInternal(hostFun);
+  return g_last_cudaError = cudaSuccess;
 }
 
 
