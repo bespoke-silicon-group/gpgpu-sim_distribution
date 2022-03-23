@@ -28,6 +28,8 @@ class gpgpu_context {
     func_sim = new cuda_sim(this);
     device_runtime = new cuda_device_runtime(this);
     stats = new ptx_stats(this);
+    for(int i = 0; i < 6; ++i)
+      envreg[i] = 0;
   }
   // global list
   symbol_table *g_global_allfiles_symbol_table;
@@ -77,6 +79,11 @@ class gpgpu_context {
   const ptx_instruction *pc_to_instruction(unsigned pc);
   const warp_inst_t *ptx_fetch_inst(address_type pc);
   unsigned translate_pc_to_ptxlineno(unsigned pc);
+
+  void set_envreg(unsigned index, unsigned value) { envreg[index] = value; }
+  unsigned get_envreg(unsigned index) { return envreg[index]; }
+  private:
+    unsigned envreg[6];
 };
 gpgpu_context *GPGPU_Context();
 

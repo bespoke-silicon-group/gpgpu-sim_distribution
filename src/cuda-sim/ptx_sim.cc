@@ -227,7 +227,7 @@ unsigned ptx_thread_info::get_builtin(int builtin_id, unsigned dim_mod) {
         case 3:
         case 4:
         case 5:
-          return 0;
+          return m_gpu->gpgpu_ctx->get_envreg(index);
           break;
         case 6:
           return gdim.x;
