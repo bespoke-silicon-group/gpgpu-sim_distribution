@@ -90,7 +90,7 @@ BFS_graphit: sparse_data clean_folder
 	mkdir -p ${RESULTS}/bfs; \
 	${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
 	${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
-	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  &
+	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out & \
 	wait
 	#${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
