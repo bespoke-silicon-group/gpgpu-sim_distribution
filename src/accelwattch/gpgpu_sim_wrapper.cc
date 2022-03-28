@@ -976,6 +976,10 @@ void gpgpu_sim_wrapper::print_power_kernel_stats(
     const std::string& kernel_info_string, bool print_trace) {
   detect_print_steady_state(1, init_value);
   if (g_power_simulation_enabled) {
+    fflush(stdout);
+    powerfile.copyfmt(std::cout);                                  //1
+    powerfile.clear(std::cout.rdstate());                          //2
+    powerfile.basic_ios<char>::rdbuf(std::cout.rdbuf());
     powerfile << kernel_info_string << std::endl;
 
     sanity_check((kernel_power.avg * kernel_sample_count), kernel_tot_power);
