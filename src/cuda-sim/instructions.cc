@@ -1755,6 +1755,43 @@ void bfind_impl(const ptx_instruction *pI, ptx_thread_info *thread)
 
 }
 
+void bfind_shift_impl(const ptx_instruction *pI, ptx_thread_info *thread)
+{
+  const operand_info &dst  = pI->dst();
+  const operand_info &src1 = pI->src1();
+  const unsigned i_type = pI->get_type();
+
+  const ptx_reg_t src1_data = thread->get_operand_value(src1, dst, i_type, thread, 1);
+  const int msb = ( i_type == U32_TYPE || i_type == S32_TYPE) ? 31 : 63;
+
+  unsigned long a = 0;
+  switch (i_type)
+  {
+    case S32_TYPE: a = src1_data.s32; break;
+    case U32_TYPE: a = src1_data.u32; break;
+    case S64_TYPE: a = src1_data.s64; break;
+    case U64_TYPE: a = src1_data.u64; break;
+    default: assert(false); abort();
+  }
+
+  // negate negative signed inputs
+  if ( ( i_type == S32_TYPE || i_type == S64_TYPE ) && ( a & ( 1 << msb ) ) ) {
+      a = ~a;
+  }
+  uint32_t d_data = 0xffffffff;
+  for (uint32_t i = msb; i >= 0; i--) {
+      if (a & (1<<i))  { d_data = i; break; }
+  }
+  
+  
+  if (d_data != 0xffffffff)  { d_data = msb - d_data; }
+
+  // store d
+  thread->set_operand_value(dst, d_data, U32_TYPE, thread, pI);
+
+
+}
+
 void bra_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
   const operand_info &target = pI->dst();
   ptx_reg_t target_pc =
@@ -3972,6 +4009,12 @@ void mad_def(const ptx_instruction *pI, ptx_thread_info *thread,
           break;
         case RZ_OPTION:
           fesetround(FE_TOWARDZERO);
+          break;
+        case RM_OPTION:
+          fesetround(FE_DOWNWARD);
+          break;
+        case RP_OPTION:
+          fesetround(FE_UPWARD);
           break;
         default:
           //assert(0);
