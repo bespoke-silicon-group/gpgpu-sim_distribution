@@ -1,4 +1,4 @@
-.PHONY: BLK sparse_data aes_data
+.PHONY: BLK sparse_data aes_data DMR
 
 sparse_data:
 	cd sparse; $(MAKE)
@@ -19,3 +19,11 @@ aes_input_${AES_SIZE}.in:
 
 BLK:
 	cd BLK; $(MAKE)
+	
+DMR: meshes/250k.2.ele
+
+meshes/250k.2.ele: small_inputs_for_lonestar_test.tar.gz
+	tar -xzf small_inputs_for_lonestar_test.tar.gz
+
+small_inputs_for_lonestar_test.tar.gz:
+	wget http://iss.oden.utexas.edu/projects/galois/downloads/small_inputs_for_lonestar_test.tar.gz

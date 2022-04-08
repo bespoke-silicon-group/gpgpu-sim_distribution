@@ -7,7 +7,10 @@ RESULTS=./results
 SHELL := /bin/bash
 TS := $(shell /bin/date "+%Y-%m-%d_%H-%M-%S")
 
-.PHONY: sparse_data SpGEMM BFS clean_folder
+.PHONY: sparse_data SpGEMM BFS clean_folder all
+
+all: SpGEMM SGEMM BFS_graphit SSSP_graphit FFT AES Jacobi BS NFA SW PR BH DMR
+
 
 SpGEMM_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
 SpGEMM: sparse_data ${BIN}/spgemm clean_folder
@@ -191,6 +194,25 @@ SW: clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SW; \
 	${BIN}/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
+
+
+BH: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/BH; \
+	${BIN}/bh 10000 10 0 > ${RESULTS}/BH/bh_${TS}.out
+
+DMR: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/DMR; \
+	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
