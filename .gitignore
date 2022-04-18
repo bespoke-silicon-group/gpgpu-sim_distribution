@@ -4,8 +4,10 @@
 *_app_cuda*
 *_cuobjdump*
 **/*.mtx*
+**/*.gr*
 **/*.txt
 **/*.in
+**/*.exe
 **/.vscode
 precompiled_bin/**
 src/intersim2/lex.yy.c

@@ -1743,7 +1743,7 @@ void bfind_impl(const ptx_instruction *pI, ptx_thread_info *thread)
       a = ~a;
   }
   uint32_t d_data = 0xffffffff;
-  for (uint32_t i = msb; i >= 0; i--) {
+  for (int32_t i = msb; i >= 0; i--) {
       if (a & (1<<i))  { d_data = i; break; }
   }
 
@@ -1779,7 +1779,7 @@ void bfind_shift_impl(const ptx_instruction *pI, ptx_thread_info *thread)
       a = ~a;
   }
   uint32_t d_data = 0xffffffff;
-  for (uint32_t i = msb; i >= 0; i--) {
+  for (int32_t i = msb; i >= 0; i--) {
       if (a & (1<<i))  { d_data = i; break; }
   }
   
