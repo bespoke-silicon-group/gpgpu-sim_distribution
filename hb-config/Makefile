@@ -82,7 +82,21 @@ PR: sparse_data clean_folder
 	#${BIN}/pr ${SPARSE}/road_central.mtx
 	#${BIN}/pr ${SPARSE}/road_usa.mtx
 
-
+BFS_chai: sparse_data clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/bfs_chai; \
+	curr=$$(pwd);\
+	cd ${SPARSE};\
+	files=$$(ls *.parboil.gr); \
+	cd $$curr;\
+	for i in $$files; do\
+		${BIN}/bfs_chai -f ${SPARSE}/$${i} > ${RESULTS}/bfs_chai/$${i}_${TS}.out & \
+	done; \
+	wait
 
 BFS_graphit: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -91,11 +105,11 @@ BFS_graphit: sparse_data clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/bfs; \
-	${BIN}/bfs_social ${SPARSE}/roadNet-CA.mtx 985640 0.01 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
-	${BIN}/bfs_social ${SPARSE}/road_central.mtx 7040908 0.01 > ${RESULTS}/bfs/road_central_${TS}.out  & \
-	${BIN}/bfs_social ${SPARSE}/road_usa.mtx 11973673 0.01 > ${RESULTS}/bfs/road_usa_${TS}.out & \
-	wait
-	#${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
+	${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
+	#${BIN}/bfs_social ${SPARSE}/roadNet-CA.mtx 985640 0.01 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
+	#${BIN}/bfs_social ${SPARSE}/road_central.mtx 7040908 0.01 > ${RESULTS}/bfs/road_central_${TS}.out  & \
+	#${BIN}/bfs_social ${SPARSE}/road_usa.mtx 11973673 0.01 > ${RESULTS}/bfs/road_usa_${TS}.out & \
+	#wait
 	#${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
 	#${BIN}/bfs_social ${SPARSE}/hollywood-2009.mtx 570170 0.026 > ${RESULTS}/bfs/hollywood-2009_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/ljournal-2008.mtx 2681669 0.006 > ${RESULTS}/bfs/ljournal-2008_${TS}.out  & \
@@ -219,6 +233,7 @@ ${CUDA_PATH}/include/cusp: cusp/
 	
 sparse_data: 
 	cd ${DATASET}; make sparse_data
+	
 
 clean_folder:
 	rm -f _app_cuda*
