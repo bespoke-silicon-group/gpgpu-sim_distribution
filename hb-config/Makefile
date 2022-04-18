@@ -184,7 +184,7 @@ NFA: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/NFA; \
-	${BIN}/nfa_engine -a ${DATASET}/Sample_NFA/Sample_NFA -i ${DATASET}/random_stream_1KB.input -T 1024 -g 1 -p 10 -N 3072 -O 1 > ${RESULTS}/NFA/nfa_${TS}.out
+	${BIN}/nfa_engine -a ${DATASET}/Sample_NFA/Sample_NFA -i ${DATASET}/random_stream_10KB.input -T 1024 -g 1 -p 160 -N 3072 -O 1 > ${RESULTS}/NFA/nfa_${TS}.out
 	
 SW: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -203,7 +203,7 @@ BH: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/BH; \
-	${BIN}/bh 10000 10 0 > ${RESULTS}/BH/bh_${TS}.out
+	${BIN}/bh 30000 1 0 > ${RESULTS}/BH/bh_${TS}.out
 
 DMR: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
