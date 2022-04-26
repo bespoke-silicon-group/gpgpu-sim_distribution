@@ -1082,12 +1082,13 @@ unsigned type_info_key::type_decode(int type, size_t &size, int &basic_type) {
   }
 }
 
-arg_buffer_t copy_arg_to_buffer(ptx_thread_info *thread,
+arg_buffer_t* copy_arg_to_buffer(ptx_thread_info *thread,
                                 operand_info actual_param_op,
                                 const symbol *formal_param) {
   if (actual_param_op.is_reg()) {
     ptx_reg_t value = thread->get_reg(actual_param_op.get_symbol());
-    return arg_buffer_t(formal_param, actual_param_op, value);
+    arg_buffer_t *args = new arg_buffer_t(formal_param, actual_param_op, value);
+    return args;
   } else if (actual_param_op.is_param_local()) {
     unsigned size = formal_param->get_size_in_bytes();
     addr_t frame_offset = actual_param_op.get_symbol()->get_address();
@@ -1095,7 +1096,8 @@ arg_buffer_t copy_arg_to_buffer(ptx_thread_info *thread,
     char buffer[1024];
     assert(size < 1024);
     thread->m_local_mem->read(from_addr, size, buffer);
-    return arg_buffer_t(formal_param, actual_param_op, buffer, size);
+    arg_buffer_t *args = new arg_buffer_t(formal_param, actual_param_op, buffer, size);
+    return args;
   } else {
     printf(
         "GPGPU-Sim PTX: ERROR ** need to add support for this operand type in "
@@ -1139,7 +1141,7 @@ void copy_buffer_list_into_frame(ptx_thread_info *thread,
                                  arg_buffer_list_t &arg_values) {
   arg_buffer_list_t::iterator a;
   for (a = arg_values.begin(); a != arg_values.end(); a++) {
-    copy_buffer_to_frame(thread, *a);
+    copy_buffer_to_frame(thread, **a);
   }
 }
 

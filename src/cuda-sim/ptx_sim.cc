@@ -446,7 +446,7 @@ bool ptx_thread_info::callstack_pop() {
   // read return value from callee frame
   arg_buffer_t buffer(m_gpu->gpgpu_ctx);
   if (rv_src != NULL)
-    buffer = copy_arg_to_buffer(this, operand_info(rv_src, m_gpu->gpgpu_ctx),
+    buffer = *copy_arg_to_buffer(this, operand_info(rv_src, m_gpu->gpgpu_ctx),
                                 rv_dst);
 
   m_symbol_table = m_callstack.back().m_symbol_table;
@@ -481,7 +481,7 @@ bool ptx_thread_info::callstack_pop_plus() {
   // read return value from callee frame
   arg_buffer_t buffer(m_gpu->gpgpu_ctx);
   if (rv_src != NULL)
-    buffer = copy_arg_to_buffer(this, operand_info(rv_src, m_gpu->gpgpu_ctx),
+    buffer = *copy_arg_to_buffer(this, operand_info(rv_src, m_gpu->gpgpu_ctx),
                                 rv_dst);
 
   m_symbol_table = m_callstack.back().m_symbol_table;

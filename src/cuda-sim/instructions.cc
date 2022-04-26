@@ -2191,8 +2191,8 @@ void call_impl(const ptx_instruction *pI, ptx_thread_info *thread) {
   const symbol *func_addr = target.get_symbol();
   function_info *target_func = func_addr->get_pc();
   if (target_func->is_pdom_set()) {
-    printf("GPGPU-Sim PTX: PDOM analysis already done for %s \n",
-           target_func->get_name().c_str());
+    //printf("GPGPU-Sim PTX: PDOM analysis already done for %s \n",
+    //       target_func->get_name().c_str());
   } else {
     printf("GPGPU-Sim PTX: finding reconvergence points for \'%s\'...\n",
            target_func->get_name().c_str());

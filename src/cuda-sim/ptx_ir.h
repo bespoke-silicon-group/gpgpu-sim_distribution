@@ -1439,6 +1439,7 @@ class arg_buffer_t {
     m_is_param = another.m_is_param;
     m_reg_value = another.m_reg_value;
     m_param_bytes = another.m_param_bytes;
+    m_param_value = NULL;
     if (m_is_param) {
       m_param_value = malloc(m_param_bytes);
       memcpy(m_param_value, another.m_param_value, m_param_bytes);
@@ -1446,7 +1447,10 @@ class arg_buffer_t {
   }
   void operator=(const arg_buffer_t &another) { make_copy(another); }
   ~arg_buffer_t() {
-    if (m_is_param) free(m_param_value);
+    if (m_is_param && m_param_value != NULL) {
+      free(m_param_value);
+      m_param_value = NULL;
+    }
   }
   arg_buffer_t(const symbol *dst_sym, const operand_info &src_op,
                ptx_reg_t source_value)
@@ -1456,6 +1460,7 @@ class arg_buffer_t {
     if (dst_sym->is_reg()) {
       m_is_reg = true;
       m_is_param = false;
+      m_param_value = NULL;
       assert(src_op.is_reg());
       m_reg_value = source_value;
     } else {
@@ -1474,6 +1479,7 @@ class arg_buffer_t {
     if (dst_sym->is_reg()) {
       m_is_reg = true;
       m_is_param = false;
+      m_param_value = NULL;
       assert(src_op.is_param_local());
       assert(dst_sym->get_size_in_bytes() == array_size);
       switch (array_size) {
@@ -1541,8 +1547,8 @@ class arg_buffer_t {
   unsigned m_param_bytes;
 };
 
-typedef std::list<arg_buffer_t> arg_buffer_list_t;
-arg_buffer_t copy_arg_to_buffer(ptx_thread_info *thread,
+typedef std::list<arg_buffer_t *> arg_buffer_list_t;
+arg_buffer_t* copy_arg_to_buffer(ptx_thread_info *thread,
                                 operand_info actual_param_op,
                                 const symbol *formal_param);
 void copy_args_into_buffer_list(const ptx_instruction *pI,
