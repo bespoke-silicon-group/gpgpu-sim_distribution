@@ -1640,6 +1640,25 @@ struct shader_core_stats_pod {
   double *m_num_sin_acesses;
   double *m_num_exp_acesses;
   double *m_num_mem_acesses;
+  double *m_num_ialu_acesses2;
+  double *m_num_fp_acesses2;
+  double *m_num_imul_acesses2;
+  double *m_num_fpmul_acesses2;
+  double *m_num_idiv_acesses2;
+  double *m_num_fpdiv_acesses2;
+  double *m_num_sp_acesses2;
+  double *m_num_sfu_acesses2;
+  double *m_num_tensor_core_acesses2;
+  double *m_num_tex_acesses2;
+  double *m_num_const_acesses2;
+  double *m_num_dp_acesses2;
+  double *m_num_dpmul_acesses2;
+  double *m_num_dpdiv_acesses2;
+  double *m_num_sqrt_acesses2;
+  double *m_num_log_acesses2;
+  double *m_num_sin_acesses2;
+  double *m_num_exp_acesses2;
+  double *m_num_mem_acesses2;
   unsigned *m_num_sp_committed;
   unsigned *m_num_tlb_hits;
   unsigned *m_num_tlb_accesses;
@@ -1651,6 +1670,8 @@ struct shader_core_stats_pod {
   unsigned *m_non_rf_operands;
   double *m_num_imul24_acesses;
   double *m_num_imul32_acesses;
+  double *m_num_imul24_acesses2;
+  double *m_num_imul32_acesses2;
   unsigned *m_active_sp_lanes;
   unsigned *m_active_sfu_lanes;
   unsigned *m_active_tensor_core_lanes;
@@ -1774,6 +1795,49 @@ class shader_core_stats : public shader_core_stats_pod {
         (double*) calloc(config->num_shader(),sizeof(double));
     m_num_mem_acesses =
         (double *)calloc(config->num_shader(), sizeof(double));
+
+    m_num_ialu_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_fp_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_imul_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_imul24_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_imul32_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_fpmul_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_idiv_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_fpdiv_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_sp_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_sfu_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_tensor_core_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_tex_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_const_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_dp_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_dpmul_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_dpdiv_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_sqrt_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_log_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_sin_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_exp_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
+    m_num_mem_acesses2 =
+        (double *)calloc(config->num_shader(), sizeof(double));
     m_num_sp_committed =
         (unsigned *)calloc(config->num_shader(), sizeof(unsigned));
     m_num_tlb_hits = 
@@ -1860,6 +1924,27 @@ class shader_core_stats : public shader_core_stats_pod {
     free(m_num_sin_acesses);
     free(m_num_exp_acesses);
     free(m_num_mem_acesses);
+
+    free(m_num_ialu_acesses2);
+    free(m_num_fp_acesses2);
+    free(m_num_imul_acesses2);
+    free(m_num_fpmul_acesses2);
+    free(m_num_idiv_acesses2);
+    free(m_num_fpdiv_acesses2);
+    free(m_num_sp_acesses2);
+    free(m_num_sfu_acesses2);
+    free(m_num_tensor_core_acesses2);
+    free(m_num_tex_acesses2);
+    free(m_num_const_acesses2);
+    free(m_num_dp_acesses2);
+    free(m_num_dpmul_acesses2);
+    free(m_num_dpdiv_acesses2);
+    free(m_num_sqrt_acesses2);
+    free(m_num_log_acesses2);
+    free(m_num_sin_acesses2);
+    free(m_num_exp_acesses2);
+    free(m_num_mem_acesses2);
+
     free(m_num_sp_committed);
     free(m_num_tlb_hits);
     free(m_num_tlb_accesses);
@@ -1871,6 +1956,8 @@ class shader_core_stats : public shader_core_stats_pod {
     free(m_non_rf_operands);
     free(m_num_imul24_acesses);
     free(m_num_imul32_acesses);
+    free(m_num_imul24_acesses2);
+    free(m_num_imul32_acesses2);
     free(m_active_sp_lanes);
     free(m_active_sfu_lanes);
     free(m_active_tensor_core_lanes);
@@ -2272,6 +2359,74 @@ class shader_core_ctx : public core_t {
     m_stats->n_simt_to_mem[m_sid] += n_flits;
   }
   bool check_if_non_released_reduction_barrier(warp_inst_t &inst);
+
+  void incialu_stat2(unsigned active_count,double latency) {
+      m_stats->m_num_ialu_acesses2[m_sid]+= active_count;
+  }
+  void incimul_stat2(unsigned active_count,double latency) {
+      m_stats->m_num_imul_acesses2[m_sid]+= active_count;
+  }
+  void incimul24_stat2(unsigned active_count,double latency) {
+      m_stats->m_num_imul24_acesses2[m_sid]+= active_count;
+   }
+   void incimul32_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_imul32_acesses2[m_sid]+= active_count;
+  }
+   void incidiv_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_idiv_acesses2[m_sid]+= active_count;
+  }
+   void incfpalu_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_fp_acesses2[m_sid]+= active_count;
+  }
+   void incfpmul_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_fpmul_acesses2[m_sid]+= active_count;
+   }
+   void incfpdiv_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_fpdiv_acesses2[m_sid]+= active_count;
+   }
+   void incdpalu_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_dp_acesses2[m_sid]+= active_count;
+   }
+   void incdpmul_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_dpmul_acesses2[m_sid]+= active_count;
+   }
+   void incdpdiv_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_dpdiv_acesses2[m_sid]+= active_count;
+   }
+
+   void incsqrt_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_sqrt_acesses2[m_sid]+= active_count;
+   }
+
+   void inclog_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_log_acesses2[m_sid]+= active_count;
+   }
+
+   void incexp_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_exp_acesses2[m_sid]+= active_count;
+  }
+
+   void incsin_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_sin_acesses2[m_sid]+= active_count;
+  }
+
+   void inctensor_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_tensor_core_acesses2[m_sid]+= active_count;
+  }
+
+  void inctex_stat2(unsigned active_count,double latency) {
+    m_stats->m_num_tex_acesses2[m_sid]+= active_count;
+  }
+
+  void incsfu_stat2(unsigned active_count, double latency) {
+    m_stats->m_num_sfu_acesses2[m_sid]+= active_count;
+  }
+  void incsp_stat2(unsigned active_count, double latency) {
+    m_stats->m_num_sp_acesses2[m_sid]+= active_count;
+  }
+  void incmem_stat2(unsigned active_count, double latency) {
+    m_stats->m_num_mem_acesses2[m_sid]+= active_count;
+  }
 
  protected:
   unsigned inactive_lanes_accesses_sfu(unsigned active_count, double latency) {

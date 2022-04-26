@@ -689,6 +689,111 @@ void shader_core_stats::print(FILE *fout) const {
   // "gpgpu_stall_shd_mem[l_mem_ld][wb_rsrv_fail] = %d\n",
   // gpu_stall_shd_mem_breakdown[L_MEM_ST][WB_CACHE_RSRV_FAIL]);
 
+  int num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_ialu_acesses2[i];
+  printf("NUM_IALU_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_fp_acesses2[i];
+  printf("NUM_FP_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_imul_acesses2[i];
+  printf("NUM_IMUL_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_imul24_acesses2[i];
+  printf("NUM_IMUL24_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_imul32_acesses2[i];
+  printf("NUM_IMUL32_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_fpmul_acesses2[i];
+  printf("NUM_FPMUL_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_idiv_acesses2[i];
+  printf("NUM_IDIV_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_fpdiv_acesses2[i];
+  printf("NUM_FPDIV_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_sp_acesses2[i];
+  printf("NUM_SP_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_sfu_acesses2[i];
+  printf("NUM_SFU_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_tensor_core_acesses2[i];
+  printf("NUM_TENSOR_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_tex_acesses2[i];
+  printf("NUM_TEX_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_const_acesses2[i];
+  printf("NUM_CONST_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_dp_acesses2[i];
+  printf("NUM_DP_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_dpmul_acesses2[i];
+  printf("NUM_IALU_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_dpdiv_acesses2[i];
+  printf("NUM_DPDIV_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_sqrt_acesses2[i];
+  printf("NUM_SQRT_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_log_acesses2[i];
+  printf("NUM_LOG_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_sin_acesses2[i];
+  printf("NUM_SIN_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_exp_acesses2[i];
+  printf("NUM_EXP_ACC2 = %d\n", num);
+  
+  num = 0;
+  for (unsigned i = 0; i < m_config->num_shader(); i++)
+    num += m_num_mem_acesses2[i];
+  printf("NUM_MEM_ACC2 = %d\n", num);
+
   fprintf(fout, "gpu_reg_bank_conflict_stalls = %d\n",
           gpu_reg_bank_conflict_stalls);
 
@@ -2978,54 +3083,71 @@ void shader_core_ctx::incexecstat(warp_inst_t *&inst)
     switch(inst->sp_op){
     case INT__OP:
       incialu_stat(inst->active_count(), scaling_coeffs->int_coeff);
+      incialu_stat2(inst->active_count(), scaling_coeffs->int_coeff);
       break;
     case INT_MUL_OP:
       incimul_stat(inst->active_count(), scaling_coeffs->int_mul_coeff);
+      incimul_stat2(inst->active_count(), scaling_coeffs->int_mul_coeff);
       break;
     case INT_MUL24_OP:
       incimul24_stat(inst->active_count(), scaling_coeffs->int_mul24_coeff);
+      incimul24_stat2(inst->active_count(), scaling_coeffs->int_mul24_coeff);
       break;
     case INT_MUL32_OP:
       incimul32_stat(inst->active_count(), scaling_coeffs->int_mul32_coeff);
+      incimul32_stat2(inst->active_count(), scaling_coeffs->int_mul32_coeff);
       break;
     case INT_DIV_OP:
       incidiv_stat(inst->active_count(), scaling_coeffs->int_div_coeff);
+      incidiv_stat2(inst->active_count(), scaling_coeffs->int_div_coeff);
       break;
     case FP__OP:
       incfpalu_stat(inst->active_count(),scaling_coeffs->fp_coeff);
+      incfpalu_stat2(inst->active_count(),scaling_coeffs->fp_coeff);
       break;
     case FP_MUL_OP:
       incfpmul_stat(inst->active_count(), scaling_coeffs->fp_mul_coeff);
+      incfpmul_stat2(inst->active_count(), scaling_coeffs->fp_mul_coeff);
       break;
     case FP_DIV_OP:
       incfpdiv_stat(inst->active_count(), scaling_coeffs->fp_div_coeff);
+      incfpdiv_stat2(inst->active_count(), scaling_coeffs->fp_div_coeff);
       break;
     case DP___OP:
       incdpalu_stat(inst->active_count(), scaling_coeffs->dp_coeff);
+      incdpalu_stat2(inst->active_count(), scaling_coeffs->dp_coeff);
       break;
     case DP_MUL_OP:
       incdpmul_stat(inst->active_count(), scaling_coeffs->dp_mul_coeff);
+      incdpmul_stat2(inst->active_count(), scaling_coeffs->dp_mul_coeff);
       break;
     case DP_DIV_OP:
       incdpdiv_stat(inst->active_count(), scaling_coeffs->dp_div_coeff);
+      incdpdiv_stat2(inst->active_count(), scaling_coeffs->dp_div_coeff);
       break;
     case FP_SQRT_OP:
       incsqrt_stat(inst->active_count(), scaling_coeffs->sqrt_coeff);
+      incsqrt_stat2(inst->active_count(), scaling_coeffs->sqrt_coeff);
       break;
     case FP_LG_OP:
       inclog_stat(inst->active_count(), scaling_coeffs->log_coeff);
+      inclog_stat2(inst->active_count(), scaling_coeffs->log_coeff);
       break;
     case FP_SIN_OP:
       incsin_stat(inst->active_count(), scaling_coeffs->sin_coeff);
+      incsin_stat2(inst->active_count(), scaling_coeffs->sin_coeff);
       break;
     case FP_EXP_OP:
       incexp_stat(inst->active_count(), scaling_coeffs->exp_coeff);
+      incexp_stat2(inst->active_count(), scaling_coeffs->exp_coeff);
       break;
     case TENSOR__OP:
       inctensor_stat(inst->active_count(), scaling_coeffs->tensor_coeff);
+      inctensor_stat2(inst->active_count(), scaling_coeffs->tensor_coeff);
       break;
     case TEX__OP:
       inctex_stat(inst->active_count(), scaling_coeffs->tex_coeff);
+      inctex_stat2(inst->active_count(), scaling_coeffs->tex_coeff);
       break;
     default:
       break;
