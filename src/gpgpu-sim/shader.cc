@@ -729,15 +729,15 @@ void shader_core_stats::print(FILE *fout) const {
     num += m_num_fpdiv_acesses2[i];
   printf("NUM_FPDIV_ACC2 = %d\n", num);
   
-  num = 0;
-  for (unsigned i = 0; i < m_config->num_shader(); i++)
-    num += m_num_sp_acesses2[i];
-  printf("NUM_SP_ACC2 = %d\n", num);
+  //num = 0;
+  //for (unsigned i = 0; i < m_config->num_shader(); i++)
+    //num += m_num_sp_acesses2[i];
+  //printf("NUM_SP_ACC2 = %d\n", num);
   
-  num = 0;
-  for (unsigned i = 0; i < m_config->num_shader(); i++)
-    num += m_num_sfu_acesses2[i];
-  printf("NUM_SFU_ACC2 = %d\n", num);
+  //num = 0;
+  //for (unsigned i = 0; i < m_config->num_shader(); i++)
+  //  num += m_num_sfu_acesses2[i];
+  //printf("NUM_SFU_ACC2 = %d\n", num);
   
   num = 0;
   for (unsigned i = 0; i < m_config->num_shader(); i++)
@@ -789,10 +789,10 @@ void shader_core_stats::print(FILE *fout) const {
     num += m_num_exp_acesses2[i];
   printf("NUM_EXP_ACC2 = %d\n", num);
   
-  num = 0;
-  for (unsigned i = 0; i < m_config->num_shader(); i++)
-    num += m_num_mem_acesses2[i];
-  printf("NUM_MEM_ACC2 = %d\n", num);
+  //num = 0;
+  //for (unsigned i = 0; i < m_config->num_shader(); i++)
+    //num += m_num_mem_acesses2[i];
+  //printf("NUM_MEM_ACC2 = %d\n", num);
 
   fprintf(fout, "gpu_reg_bank_conflict_stalls = %d\n",
           gpu_reg_bank_conflict_stalls);
@@ -3154,6 +3154,7 @@ void shader_core_ctx::incexecstat(warp_inst_t *&inst)
     }
     if(inst->const_cache_operand) //warp has const address space load as one operand
       inc_const_accesses(1);
+      inc_const_accesses2(1);
   }
 }
 void shader_core_ctx::print_stage(unsigned int stage, FILE *fout) const {

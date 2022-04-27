@@ -2305,6 +2305,10 @@ class shader_core_ctx : public core_t {
     m_stats->m_num_const_acesses[m_sid]=m_stats->m_num_const_acesses[m_sid]+active_count;
   }
 
+  void inc_const_accesses2(unsigned active_count) {
+    m_stats->m_num_const_acesses2[m_sid]=m_stats->m_num_const_acesses2[m_sid]+active_count;
+  }
+
   void incsfu_stat(unsigned active_count, double latency) {
     m_stats->m_num_sfu_acesses[m_sid] =
         m_stats->m_num_sfu_acesses[m_sid] + (double)active_count*latency;
