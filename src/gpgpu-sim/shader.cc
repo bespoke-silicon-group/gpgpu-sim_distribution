@@ -762,7 +762,7 @@ void shader_core_stats::print(FILE *fout) const {
   num = 0;
   for (unsigned i = 0; i < m_config->num_shader(); i++)
     num += m_num_dpmul_acesses2[i];
-  printf("NUM_IALU_ACC2 = %d\n", num);
+  printf("NUM_DPMUL_ACC2 = %d\n", num);
   
   num = 0;
   for (unsigned i = 0; i < m_config->num_shader(); i++)
