@@ -228,16 +228,33 @@ DMR: clean_folder
 	mkdir -p ${RESULTS}/DMR; \
 	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
+chase_sizes = 65536 3145728 67108864
+threads = 16 32 64 128 256 512 1024 2048
+ptr_chase: clean_folder 
+	#export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	#cd ..; \
+	#source setup_environment; \
+	#$(MAKE) --silent; \
+	#cd hb-config; \
+	mkdir -p ${RESULTS}/ptr_chase; \
+	for i in ${chase_sizes}; do \
+		for j in ${threads}; do\
+			${BIN}/ptr_chase $${i} 200 32 $${j} > ${RESULTS}/ptr_chase/chase_$${i}_200_32_$${j}.out & \
+		done; \
+	done;
+	RESULTS="${RESULTS}/ptr_chase" ${SCRIPTS}/extract_ptr_chase.sh ;
+
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
 	
 sparse_data: 
 	cd ${DATASET}; make sparse_data
 	
-
 clean_folder:
 	rm -f _app_cuda*
 	rm -f _cuobjdump*
+	rm -f *.ptx
+	rm -f *.ptxas
 
 /usr/local/cuda:
 	wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
