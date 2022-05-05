@@ -230,19 +230,37 @@ DMR: clean_folder
 
 chase_sizes = 65536 3145728 67108864
 threads = 16 32 64 128 256 512 1024 2048
+blk_size = 1 2 4 8 16 32 64 128
 ptr_chase: clean_folder 
-	#export CUDA_INSTALL_PATH=${CUDA_PATH}; \
-	#cd ..; \
-	#source setup_environment; \
-	#$(MAKE) --silent; \
-	#cd hb-config; \
-	mkdir -p ${RESULTS}/ptr_chase; \
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/ptr_chase1; \
 	for i in ${chase_sizes}; do \
 		for j in ${threads}; do\
-			${BIN}/ptr_chase $${i} 200 32 $${j} > ${RESULTS}/ptr_chase/chase_$${i}_200_32_$${j}.out & \
+			${BIN}/ptr_chase $${i} 1000 32 $${j} > ${RESULTS}/ptr_chase1/chase_$${i}_1000_32_$${j}.out; \
 		done; \
 	done;
-	RESULTS="${RESULTS}/ptr_chase" ${SCRIPTS}/extract_ptr_chase.sh ;
+	
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/ptr_chase2; \
+	for i in ${chase_sizes}; do \
+		for j in ${blk_size}; do\
+			${BIN}/ptr_chase $${i} 1000 $${j} 2048 > ${RESULTS}/ptr_chase2/chase_$${i}_1000_$${j}_2048.out; \
+		done; \
+	done;
+	
+	$(MAKE) extract_ptr_chase;
+	
+extract_ptr_chase:
+	RESULTS="${RESULTS}/ptr_chase1" ${SCRIPTS}/extract_ptr_chase1.sh;
+	RESULTS="${RESULTS}/ptr_chase2" ${SCRIPTS}/extract_ptr_chase2.sh;
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
