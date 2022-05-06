@@ -240,8 +240,9 @@ ptr_chase: clean_folder
 	mkdir -p ${RESULTS}/ptr_chase1; \
 	for i in ${chase_sizes}; do \
 		for j in ${threads}; do\
-			${BIN}/ptr_chase $${i} 1000 32 $${j} > ${RESULTS}/ptr_chase1/chase_$${i}_1000_32_$${j}.out; \
+			${BIN}/ptr_chase $${i} 32 $${j} > ${RESULTS}/ptr_chase1/chase_$${i}_1000_32_$${j}.out & \
 		done; \
+		wait; \
 	done;
 	
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -252,8 +253,9 @@ ptr_chase: clean_folder
 	mkdir -p ${RESULTS}/ptr_chase2; \
 	for i in ${chase_sizes}; do \
 		for j in ${blk_size}; do\
-			${BIN}/ptr_chase $${i} 1000 $${j} 2048 > ${RESULTS}/ptr_chase2/chase_$${i}_1000_$${j}_2048.out; \
+			${BIN}/ptr_chase $${i} $${j} 2048 > ${RESULTS}/ptr_chase2/chase_$${i}_1000_$${j}_2048.out & \
 		done; \
+		wait;
 	done;
 	
 	$(MAKE) extract_ptr_chase;
