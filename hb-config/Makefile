@@ -188,7 +188,7 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
+		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}.out; \
 	done
 	
 NFA: clean_folder
