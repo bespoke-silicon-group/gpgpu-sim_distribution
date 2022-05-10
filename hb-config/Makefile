@@ -229,9 +229,10 @@ DMR: clean_folder
 	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
 chase_sizes = 65536 3145728 67108864
-threads = 16 32 64 128 256 512 1024 2048
-blk_size = 1 2 4 8 16 32 64 128
-ptr_chase: clean_folder 
+threads = 16 32 64 128 256 512 1024 2048 4096 8192
+blk_size1 = 128 64 32 16 8 4
+blk_size2 = 2 1
+ptr_chase1: clean_folder 
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -244,7 +245,9 @@ ptr_chase: clean_folder
 		done; \
 		wait; \
 	done;
+	$(MAKE) extract_ptr_chase1;
 	
+ptr_chase2: clean_folder 
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -252,16 +255,26 @@ ptr_chase: clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/ptr_chase2; \
 	for i in ${chase_sizes}; do \
-		for j in ${blk_size}; do\
+		for j in ${blk_size1}; do\
 			${BIN}/ptr_chase $${i} $${j} 2048 > ${RESULTS}/ptr_chase2/chase_$${i}_1000_$${j}_2048.out & \
 		done; \
-		wait;
+		wait; \
+	done; \
+	for i in ${chase_sizes}; do \
+		for j in ${blk_size2}; do\
+			${BIN}/ptr_chase $${i} $${j} 2048 > ${RESULTS}/ptr_chase2/chase_$${i}_1000_$${j}_2048.out & \
+		done; \
+		wait; \
 	done;
 	
-	$(MAKE) extract_ptr_chase;
-	
 extract_ptr_chase:
+	$(MAKE) extract_ptr_chase1;
+	$(MAKE) extract_ptr_chase2;
+
+extract_ptr_chase1:
 	RESULTS="${RESULTS}/ptr_chase1" ${SCRIPTS}/extract_ptr_chase1.sh;
+	
+extract_ptr_chase2:
 	RESULTS="${RESULTS}/ptr_chase2" ${SCRIPTS}/extract_ptr_chase2.sh;
 
 ${CUDA_PATH}/include/cusp: cusp/
