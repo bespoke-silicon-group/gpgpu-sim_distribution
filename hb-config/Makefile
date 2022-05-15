@@ -98,6 +98,22 @@ BFS_chai: sparse_data clean_folder
 	done; \
 	wait
 
+SSSP_chai: sparse_data clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/sssp_chai; \
+	curr=$$(pwd);\
+	cd ${SPARSE};\
+	files=$$(ls *.parboil.gr); \
+	cd $$curr;\
+	for i in $$files; do\
+		${BIN}/sssp_chai -f ${SPARSE}/$${i} > ${RESULTS}/sssp_chai/$${i}_${TS}.out & \
+	done; \
+	wait
+
 BFS_graphit: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
