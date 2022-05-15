@@ -228,7 +228,7 @@ DMR: clean_folder
 	mkdir -p ${RESULTS}/DMR; \
 	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
-chase_sizes = 65536 3145728 67108864
+chase_sizes = 65536 3145728 536870912
 threads = 16 32 64 128 256 512 1024 2048 4096 8192
 blk_size1 = 128 64 32 16 8 4
 blk_size2 = 2 1
@@ -267,6 +267,18 @@ ptr_chase2: clean_folder
 		wait; \
 	done;
 	
+ptr_chase_single: clean_folder 
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/ptr_chase_single; \
+	for i in ${chase_sizes}; do \
+			${BIN}/ptr_chase_single $${i} > ${RESULTS}/ptr_chase_single/chase_$${i}.out & \
+	done; \
+	wait;
+	
 extract_ptr_chase:
 	$(MAKE) extract_ptr_chase1;
 	$(MAKE) extract_ptr_chase2;
@@ -276,6 +288,9 @@ extract_ptr_chase1:
 	
 extract_ptr_chase2:
 	RESULTS="${RESULTS}/ptr_chase2" ${SCRIPTS}/extract_ptr_chase2.sh;
+	
+extract_ptr_chase_single:
+	RESULTS="${RESULTS}/ptr_chase_single" ${SCRIPTS}/extract_ptr_chase_single.sh;
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
