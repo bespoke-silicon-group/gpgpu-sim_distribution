@@ -168,7 +168,9 @@ FFT: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/fft; \
-	${BIN}/fft > ${RESULTS}/fft/fft_${TS}.out
+	${BIN}/fft_16384_64 > ${RESULTS}/fft/fft_16384_64_${TS}.out & \
+	${BIN}/fft_16384_320 > ${RESULTS}/fft/fft_16384_320_${TS}.out & \
+	${BIN}/fft_65536_64 > ${RESULTS}/fft/fft_65536_64_${TS}.out;
 
 # 1 MB
 AES_SIZE ?= 16777216
@@ -233,7 +235,9 @@ BH: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/BH; \
-	${BIN}/bh 30000 1 0 > ${RESULTS}/BH/bh_${TS}.out
+	${BIN}/bh 8192 1 0 > ${RESULTS}/BH/bh_8192_${TS}.out &\
+	${BIN}/bh 16384 1 0 > ${RESULTS}/BH/bh_16384_${TS}.out &\
+	${BIN}/bh 32768 1 0 > ${RESULTS}/BH/bh_32768_${TS}.out
 
 DMR: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -244,10 +248,10 @@ DMR: clean_folder
 	mkdir -p ${RESULTS}/DMR; \
 	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
-chase_sizes = 65536 3145728 536870912
-threads = 16 32 64 128 256 512 1024 2048 4096 8192
-blk_size1 = 128 64 32 16 8 4
-blk_size2 = 2 1
+chase_sizes = 65536 3145728 268435456 #
+threads = 16 32 64 128 256 512 1024 2048 #4096 8192
+blk_size1 = 128 64 32 16 8
+blk_size2 = 4 2 1
 ptr_chase1: clean_folder 
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
