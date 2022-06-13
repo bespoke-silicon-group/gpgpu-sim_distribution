@@ -10,6 +10,9 @@ convert_to_parboil.exe: mtx_to_parboil.cpp
 wiki-Vote.parboil.gr: wiki-Vote.mtx convert_to_parboil.exe
 	./convert_to_parboil.exe wiki-Vote.mtx 4668
 
+offshore.parboil.gr: offshore.mtx convert_to_parboil.exe
+	./convert_to_parboil.exe offshore.mtx 0
+
 soc-Pokec.parboil.gr: soc-Pokec.mtx convert_to_parboil.exe
 	./convert_to_parboil.exe soc-Pokec.mtx 816408
 
