@@ -182,7 +182,9 @@ FFT: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/fft; \
-	${BIN}/fft > ${RESULTS}/fft/fft_${TS}.out
+	${BIN}/fft_16384_64 > ${RESULTS}/fft/fft_16384_64_${TS}.out & \
+	${BIN}/fft_16384_320 > ${RESULTS}/fft/fft_16384_320_${TS}.out & \
+	${BIN}/fft_65536_64 > ${RESULTS}/fft/fft_65536_64_${TS}.out;
 
 # 1 MB
 AES_SIZE ?= 16777216
@@ -247,7 +249,9 @@ BH: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/BH; \
-	${BIN}/bh 30000 1 0 > ${RESULTS}/BH/bh_${TS}.out
+	${BIN}/bh 8192 1 0 > ${RESULTS}/BH/bh_8192_${TS}.out &\
+	${BIN}/bh 16384 1 0 > ${RESULTS}/BH/bh_16384_${TS}.out &\
+	${BIN}/bh 32768 1 0 > ${RESULTS}/BH/bh_32768_${TS}.out
 
 DMR: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
