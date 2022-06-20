@@ -30,6 +30,20 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 #	done
 	wait
 
+
+SpGEMM_INPUTS = wiki-Vote offshore #roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
+SpGEMM_cusp: sparse_data ${BIN}/spgemm_cusp clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SpGEMM_cusp; \
+	for i in ${SpGEMM_INPUTS}; do \
+		${BIN}/spgemm_cusp ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM_cusp/$${i}_${TS}.out & \
+	done; \
+	wait
+
 SGEMM_SIZE ?= 2048
 SGEMM:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -244,8 +258,8 @@ DMR: clean_folder
 	mkdir -p ${RESULTS}/DMR; \
 	${BIN}/dmr ../datasets/meshes/250k.2 > ${RESULTS}/DMR/dmr_${TS}.out
 
-chase_sizes = 65536 3145728 536870912
-threads = 16 32 64 128 256 512 1024 2048 4096 8192
+chase_sizes = 134217728 #65536 3145728
+threads = 16 32 64 128 256 512 #1024 2048 4096 8192
 blk_size1 = 128 64 32 16 8 4
 blk_size2 = 2 1
 ptr_chase1: clean_folder 
