@@ -6,6 +6,7 @@ SCRIPTS=./scripts
 RESULTS=./results
 SHELL := /bin/bash
 TS := $(shell /bin/date "+%Y-%m-%d_%H-%M-%S")
+BENCHMARK_DIR := $(abspath ../../bsg-motif-gpu-benchmarks-src)
 
 .PHONY: sparse_data SpGEMM BFS clean_folder
 
@@ -128,14 +129,22 @@ SSSP: sparse_data clean_folder
 	${BIN}/sssp --graph-type market --src 7040908 --graph-file ${SPARSE}/road_central.gr
 	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
 
-FFT: clean_folder
+
+## FFT
+FFT_RUNS = run.fft_16384_64 \
+					 run.fft_16384_320 \
+					 run.fft_65536_64 \
+					 run.fft_65536_320
+
+run_fft: $(FFT_RUNS)
+run.fft_%:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/fft; \
-	${BIN}/fft > ${RESULTS}/fft/fft_${TS}.out
+	$(BENCHMARK_DIR)/bin/fft_$* > ${RESULTS}/fft/fft_$*_${TS}.out
 
 # 1 MB
 AES_SIZE ?= 16777216
