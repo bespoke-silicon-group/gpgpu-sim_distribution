@@ -38,6 +38,14 @@ SGEMM:
 	mkdir -p ${RESULTS}/SGEMM; \
 	$(BENCHMARK_DIR)/bin/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
 
+SGEMM_BATCHED:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SGEMM_BATCHED; \
+	$(BENCHMARK_DIR)/bin/sgemm_batched > ${RESULTS}/SGEMM_BATCHED/SGEMM_BATCHED_512_${TS}.out
 BFS: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
