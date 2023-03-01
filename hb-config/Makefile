@@ -28,7 +28,7 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 #	done
 	wait
 
-SGEMM_SIZE ?= 2048
+SGEMM_SIZE ?= 512
 SGEMM:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -36,7 +36,7 @@ SGEMM:
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SGEMM; \
-	${BIN}/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
+	$(BENCHMARK_DIR)/bin/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
 
 BFS: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -146,7 +146,7 @@ run.fft_%:
 	mkdir -p ${RESULTS}/fft; \
 	$(BENCHMARK_DIR)/bin/fft_$* > ${RESULTS}/fft/fft_$*_${TS}.out
 
-# 1 MB
+# 16 MB
 AES_SIZE ?= 16777216
 AES: clean_folder
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE};
@@ -157,7 +157,7 @@ AES: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/AES; \
-	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/aes_${AES_SIZE}_${TS}.out
+	$(BENCHMARK_DIR)/bin/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/aes_${AES_SIZE}_${TS}.out
 
 JACOBI_ITER ?= 1
 Jacobi: clean_folder
@@ -168,7 +168,8 @@ Jacobi: clean_folder
 	cd hb-config; \
 	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
 
-BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
+BLK_INPUTS = in_10M.txt
+#BLK_INPUTS = in_16K.txt
 BS: clean_folder
 	cd ${DATASET}; $(MAKE) BLK
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -180,7 +181,7 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
+		$(BENCHMARK_DIR)/bin/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
 	done
 	
 NFA: clean_folder
@@ -199,7 +200,15 @@ SW: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SW; \
-	${BIN}/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
+	$(BENCHMARK_DIR)/bin/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
+SW32: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SW; \
+	$(BENCHMARK_DIR)/bin/sw -y local -p ${DATASET}/dna-reference32.fasta ${DATASET}/dna-query32.fasta > ${RESULTS}/SW/sw32_${TS}.out
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
