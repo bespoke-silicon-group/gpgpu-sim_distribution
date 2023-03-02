@@ -174,7 +174,7 @@ Jacobi: clean_folder
 	source setup_environment; \
 	$(MAKE) --silent; \
 	cd hb-config; \
-	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
+	$(BENCHMARK_DIR)/bin/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
 
 BLK_INPUTS = in_10M.txt
 #BLK_INPUTS = in_16K.txt
