@@ -10,8 +10,8 @@ BENCHMARK_DIR := $(abspath ../../bsg-motif-gpu-benchmarks-src)
 
 .PHONY: sparse_data SpGEMM BFS clean_folder
 
-SpGEMM_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
-SpGEMM: sparse_data ${BIN}/spgemm clean_folder
+SpGEMM_INPUTS = wiki-Vote #offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
+SpGEMM: sparse_data  clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -19,14 +19,13 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
 	for i in ${SpGEMM_INPUTS}; do \
-		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM/$${i}_${TS}.out & \
+		${SCRIPTS}/run_SpGEMM.sh $(BENCHMARK_DIR)/bin/spgemm ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM/$${i}_${TS}.out; \
 	done
-	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
 #		filename=$$(basename -a -s .mtx $$i); \
 #		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out & \
 #	done
-	wait
+#wait
 
 SGEMM_SIZE ?= 512
 SGEMM:
