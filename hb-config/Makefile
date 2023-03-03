@@ -235,3 +235,10 @@ clean_folder:
 	sudo apt-key add /var/cuda-repo-ubuntu2004-11-5-local/7fa2af80.pub
 	sudo apt-get update
 	sudo apt-get -y install cuda
+
+
+
+clean:
+	rm -f *.ptx *.ptxas *.dat _cuobjdump* code0.cu _app_cuda_version_*
+	rm -f test.out
+	rm -rf checkpoint_files
