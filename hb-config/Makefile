@@ -62,7 +62,7 @@ BFS: sparse_data clean_folder
 
 
 
-PR_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
+PR_INPUTS = wiki-Vote #offshore roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
 PR: sparse_data clean_folder 
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -71,9 +71,8 @@ PR: sparse_data clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/PR; \
 	for i in ${PR_INPUTS}; do \
-		${SCRIPTS}/run_graphit.sh ${BIN}/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out & \
-	done; \
-	wait
+		${SCRIPTS}/run_graphit.sh $(BENCHMARK_DIR)/bin/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out; \
+	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
 #		filename=$$(basename -a -s .mtx $$i); \
