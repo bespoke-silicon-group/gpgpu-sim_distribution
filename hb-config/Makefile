@@ -10,7 +10,19 @@ BENCHMARK_DIR := $(abspath ../../bsg-motif-gpu-benchmarks-src)
 
 .PHONY: sparse_data SpGEMM BFS clean_folder
 
-SpGEMM_INPUTS = wiki-Vote #offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
+NBODIES ?= 1024
+BH:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/BH; \
+	$(BENCHMARK_DIR)/bin/bh ${NBODIES} 1 0 > ${RESULTS}/BH/BH_${NBODIES}_${TS}.out
+	
+
+
+SpGEMM_INPUTS = u12k8 #offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
 SpGEMM: sparse_data  clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -95,11 +107,7 @@ BFS_graphit: sparse_data clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/bfs; \
-	${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
-	${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
-	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  &
-	wait
-	#${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
+	$(BENCHMARK_DIR)/bin/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
 	#${BIN}/bfs_social ${SPARSE}/hollywood-2009.mtx 570170 0.026 > ${RESULTS}/bfs/hollywood-2009_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/ljournal-2008.mtx 2681669 0.006 > ${RESULTS}/bfs/ljournal-2008_${TS}.out  & \
@@ -187,8 +195,7 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		$(BENCHMARK_DIR)/bin/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
-	done
+		$(BENCHMARK_DIR)/bin/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \ done
 	
 NFA: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
