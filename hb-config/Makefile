@@ -6,11 +6,24 @@ SCRIPTS=./scripts
 RESULTS=./results
 SHELL := /bin/bash
 TS := $(shell /bin/date "+%Y-%m-%d_%H-%M-%S")
+BENCHMARK_DIR := $(abspath ../../bsg-motif-gpu-benchmarks-src)
 
 .PHONY: sparse_data SpGEMM BFS clean_folder
 
-SpGEMM_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
-SpGEMM: sparse_data ${BIN}/spgemm clean_folder
+NBODIES ?= 1024
+BH:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/BH; \
+	$(BENCHMARK_DIR)/bin/bh ${NBODIES} 1 0 > ${RESULTS}/BH/BH_${NBODIES}_${TS}.out
+	
+
+
+SpGEMM_INPUTS = u12k8 #offshore roadNet-CA road_central road_usa #soc-Pokec hollywood-2009 ljournal-2008
+SpGEMM: sparse_data  clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
@@ -18,16 +31,15 @@ SpGEMM: sparse_data ${BIN}/spgemm clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SpGEMM; \
 	for i in ${SpGEMM_INPUTS}; do \
-		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM/$${i}_${TS}.out & \
+		${SCRIPTS}/run_SpGEMM.sh $(BENCHMARK_DIR)/bin/spgemm ${SPARSE}/$${i}.mtx > ${RESULTS}/SpGEMM/$${i}_${TS}.out; \
 	done
-	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
 #		filename=$$(basename -a -s .mtx $$i); \
 #		${SCRIPTS}/run_SpGEMM.sh ${BIN}/spgemm $$i > ${RESULTS}/SpGEMM/$$filename.out & \
 #	done
-	wait
+#wait
 
-SGEMM_SIZE ?= 2048
+SGEMM_SIZE ?= 512
 SGEMM:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -35,8 +47,16 @@ SGEMM:
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SGEMM; \
-	${BIN}/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
+	$(BENCHMARK_DIR)/bin/sgemm ${SGEMM_SIZE} > ${RESULTS}/SGEMM/SGEMM_${SGEMM_SIZE}_${TS}.out
 
+SGEMM_BATCHED:
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SGEMM_BATCHED; \
+	$(BENCHMARK_DIR)/bin/sgemm_batched > ${RESULTS}/SGEMM_BATCHED/SGEMM_BATCHED_512_${TS}.out
 BFS: sparse_data clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -54,7 +74,7 @@ BFS: sparse_data clean_folder
 
 
 
-PR_INPUTS = wiki-Vote offshore roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
+PR_INPUTS = wiki-Vote #offshore roadNet-CA road_central road_usa soc-Pokec hollywood-2009 ljournal-2008
 PR: sparse_data clean_folder 
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
@@ -63,9 +83,8 @@ PR: sparse_data clean_folder
 	cd hb-config; \
 	mkdir -p ${RESULTS}/PR; \
 	for i in ${PR_INPUTS}; do \
-		${SCRIPTS}/run_graphit.sh ${BIN}/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out & \
-	done; \
-	wait
+		${SCRIPTS}/run_graphit.sh $(BENCHMARK_DIR)/bin/pr ${SPARSE}/$${i}.mtx > ${RESULTS}/PR/$${i}_${TS}.out; \
+	done
 	
 #	for i in $$(ls ${SPARSE}/*.mtx); do \
 #		filename=$$(basename -a -s .mtx $$i); \
@@ -88,11 +107,7 @@ BFS_graphit: sparse_data clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/bfs; \
-	${BIN}/bfs_road ${SPARSE}/roadNet-CA.mtx 985640 > ${RESULTS}/bfs/roadNet-CA_${TS}.out  & \
-	${BIN}/bfs_road ${SPARSE}/road_central.mtx 7040908 > ${RESULTS}/bfs/road_central_${TS}.out  & \
-	${BIN}/bfs_road ${SPARSE}/road_usa.mtx 11973673 > ${RESULTS}/bfs/road_usa_${TS}.out  &
-	wait
-	#${BIN}/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
+	$(BENCHMARK_DIR)/bin/bfs_social ${SPARSE}/wiki-Vote.mtx 4668 0.01 > ${RESULTS}/bfs/wiki-Vote_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/soc-Pokec.mtx 816408 0.01 > ${RESULTS}/bfs/soc-Pokec_${TS}.out  & \
 	#${BIN}/bfs_social ${SPARSE}/hollywood-2009.mtx 570170 0.026 > ${RESULTS}/bfs/hollywood-2009_${TS}.out;
 	#${BIN}/bfs_social ${SPARSE}/ljournal-2008.mtx 2681669 0.006 > ${RESULTS}/bfs/ljournal-2008_${TS}.out  & \
@@ -128,16 +143,24 @@ SSSP: sparse_data clean_folder
 	${BIN}/sssp --graph-type market --src 7040908 --graph-file ${SPARSE}/road_central.gr
 	${BIN}/sssp --graph-type market --src 11973673 --graph-file ${SPARSE}/road_usa.gr
 
-FFT: clean_folder
+
+## FFT
+FFT_RUNS = run.fft_16384_64 \
+					 run.fft_16384_320 \
+					 run.fft_65536_64 \
+					 run.fft_65536_320
+
+run_fft: $(FFT_RUNS)
+run.fft_%:
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
 	cd ..; \
 	source setup_environment; \
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/fft; \
-	${BIN}/fft > ${RESULTS}/fft/fft_${TS}.out
+	$(BENCHMARK_DIR)/bin/fft_$* > ${RESULTS}/fft/fft_$*_${TS}.out
 
-# 1 MB
+# 16 MB
 AES_SIZE ?= 16777216
 AES: clean_folder
 	cd ${DATASET}; $(MAKE) aes_data AES_SIZE=${AES_SIZE};
@@ -148,7 +171,7 @@ AES: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/AES; \
-	${BIN}/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/aes_${AES_SIZE}_${TS}.out
+	$(BENCHMARK_DIR)/bin/aes e 128 ${DATASET}/aes_input_${AES_SIZE}.in ${DATASET}/aes_key.in > ${RESULTS}/AES/aes_${AES_SIZE}_${TS}.out
 
 JACOBI_ITER ?= 1
 Jacobi: clean_folder
@@ -157,9 +180,10 @@ Jacobi: clean_folder
 	source setup_environment; \
 	$(MAKE) --silent; \
 	cd hb-config; \
-	${BIN}/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
+	$(BENCHMARK_DIR)/bin/stencil 512 512 64 ${JACOBI_ITER} -i ${DATASET}/stencil/default/input/512x512x64x100.bin > ${RESULTS}/jacobi_512x512x64_${JACOBI_ITER}_iter_${TS}.out
 
-BLK_INPUTS = in_4.txt in_16.txt in_4K.txt in_16K.txt in_64K.txt in_10M.txt
+BLK_INPUTS = in_10M.txt
+#BLK_INPUTS = in_16K.txt
 BS: clean_folder
 	cd ${DATASET}; $(MAKE) BLK
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -171,8 +195,7 @@ BS: clean_folder
 	touch ${RESULTS}/BS.out; \
 	for i in ${BLK_INPUTS}; do \
 		echo BLK/$$i; \
-		${BIN}/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \
-	done
+		$(BENCHMARK_DIR)/bin/bs ${DATASET}/BLK/$$i > ${RESULTS}/BS/$${i}_${TS}; \ done
 	
 NFA: clean_folder
 	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
@@ -190,7 +213,15 @@ SW: clean_folder
 	$(MAKE) --silent; \
 	cd hb-config; \
 	mkdir -p ${RESULTS}/SW; \
-	${BIN}/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
+	$(BENCHMARK_DIR)/bin/sw -y local -p ${DATASET}/dna-reference.fasta ${DATASET}/dna-query.fasta > ${RESULTS}/SW/sw_${TS}.out
+SW32: clean_folder
+	export CUDA_INSTALL_PATH=${CUDA_PATH}; \
+	cd ..; \
+	source setup_environment; \
+	$(MAKE) --silent; \
+	cd hb-config; \
+	mkdir -p ${RESULTS}/SW; \
+	$(BENCHMARK_DIR)/bin/sw -y local -p ${DATASET}/dna-reference32.fasta ${DATASET}/dna-query32.fasta > ${RESULTS}/SW/sw32_${TS}.out
 
 ${CUDA_PATH}/include/cusp: cusp/
 	sudo cp -r ./cusp ${CUDA_PATH}/include/
@@ -210,3 +241,10 @@ clean_folder:
 	sudo apt-key add /var/cuda-repo-ubuntu2004-11-5-local/7fa2af80.pub
 	sudo apt-get update
 	sudo apt-get -y install cuda
+
+
+
+clean:
+	rm -f *.ptx *.ptxas *.dat _cuobjdump* code0.cu _app_cuda_version_*
+	rm -f test.out
+	rm -rf checkpoint_files
